@@ -11,15 +11,15 @@ var cnqx = 0;
 var coordss=[];
 var receptor_offset_x = -10;
 var receptor_offset_y = -50;
-
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
-
+var chill = 0;
 ctx.font = "30px Arial";
 
 function resett()
 {
 	clearInterval(id);
+	chill = 0;
 	glutamate = 0;
 	num_NMDA = 1;
 	num_AMPA = 1;
@@ -36,22 +36,20 @@ function change_glutamate(x)
 {
 	clearInterval(id);
 	glutamate = x;
-	if(glutamate == 1 && cnqx == 0 && mg == 1)
+	if(glutamate == 1)
 	{
 		coordss = [];
-		for(var i = 0; i < num_AMPA ; i++)
-		{
-			coordss.push([715+200*i,400,"Sodium"]);
-			coordss.push([715+200*i,600,"Potassium"]);
-		}
+		coordss.push([600,200,"Glutamate"]);
 		reset(num_NMDA,num_AMPA,mg,apv,cnqx,glutamate,potential);
 		flow(coordss)
 	}
+
 	else if (glutamate == 0)
 	{
 		pos = 400;
 		potential = 70;
 		mg=1;
+		chill = 0;
 		reset(num_NMDA,num_AMPA,mg,apv,cnqx,glutamate,potential);
 	}
 	reset(num_NMDA,num_AMPA,mg,apv,cnqx,glutamate,potential);
@@ -130,7 +128,7 @@ function draw_NMDA(x,y,mg,apv,glut)
 	ctx.beginPath();
 	ctx.ellipse(x, y, 50, 30, Math.PI/2, 0, Math.PI);
 	ctx.fill();
-	if(mg == 1 || apv == 1 || glutamate == 0)
+	if(mg == 1 || apv == 1 || glutamate == 0 || chill == 0)
 	{
 		offset = 0;
 	}
@@ -153,15 +151,14 @@ function draw_AMPA(x,y,mg,cnqx,glut)
 	ctx.ellipse(x, y, 50, 30, Math.PI/2, 0, Math.PI);
 	ctx.fill();
 	ctx.beginPath();
-	if(cnqx == 0)
+	if(cnqx == 0 && chill == 1)
 	{
-		ctx.ellipse(x+(30*glut), y, 50, 30, Math.PI*3/2, 0, Math.PI);
+		ctx.ellipse(x+(30*(glut)), y, 50, 30, Math.PI*3/2, 0, Math.PI);
 	}
 	else
 	{
 		ctx.ellipse(x, y, 50, 30, Math.PI*3/2, 0, Math.PI);
 	}
-	
 	ctx.fill();
 	ctx.fillText("AMPA", x-25, y+100);
 }
@@ -208,10 +205,14 @@ function reset(NMDA,AMPA,MG,APV,CNQX,GLUTAMATE,POTENTIAL)
 	ctx.fillStyle = "#FFFFFF";
 	ctx.fillRect(0, 0, 1700, 900);
 	draw_cell(500);
+	draw_cell(200);
+	ctx.fillStyle = "#000000";
+	ctx.fillText("Postsynaptic Neuron", 500, 700);
+	ctx.fillText("Presynaptic Neuron", 500, 100);
 	draw_NMDA(500,500,MG,APV,GLUTAMATE);
-	if(GLUTAMATE == 1)
+	if(GLUTAMATE == 1 && chill == 1)
 	{
-		draw_glut(600,300);
+		draw_glut(600,400);
 	}
 	if(APV==1)
 	{
@@ -221,14 +222,14 @@ function reset(NMDA,AMPA,MG,APV,CNQX,GLUTAMATE,POTENTIAL)
 	{
 		draw_Mg(500,500);
 	}
-	else if (GLUTAMATE == 1)
+	else if (GLUTAMATE == 1 && chill == 1)
 	{
 		draw_glut(500,500);
 	}
 	for(var i=0; i<AMPA; i++)
 	{
 		draw_AMPA(700+(i*200),500,MG,CNQX,GLUTAMATE);
-		if(GLUTAMATE==1 && CNQX == 0)
+		if(GLUTAMATE==1 && CNQX == 0 && chill == 1)
 		{
 			draw_glut(700+(i*200),500);
 		}
@@ -238,7 +239,6 @@ function reset(NMDA,AMPA,MG,APV,CNQX,GLUTAMATE,POTENTIAL)
 		}
 	}
 	draw_potential(400,550,POTENTIAL);
-	
 }
 
 function render()
@@ -285,7 +285,23 @@ function flow(coords)
     if (pos == 400) 
 	{
       clearInterval(id);
-	  if(mg==1)
+	  if(type=="Glutamate")
+	  {
+		chill = 1;
+		if(cnqx == 0 && mg == 1)
+		{
+			coordss = [];
+			console.log("glut end");
+			for(var i = 0; i < num_AMPA ; i++)
+			{
+				coordss.push([715+200*i,400,"Sodium"]);
+				coordss.push([715+200*i,600,"Potassium"]);
+			}
+			reset(num_NMDA,num_AMPA,mg,apv,cnqx,glutamate,potential);
+			flow(coordss)
+		}
+	  }
+	  else if(mg==1)
 	  {
 		  potential = 20;
 		  mg = 0;
@@ -313,22 +329,28 @@ function flow(coords)
 	  for(var i = 0; i<coords.length; i++)
 	  {
 		  type = coords[i][2];
-		  if(type=="Calcium"){
+		  if(type=="Calcium")
+		  {
 			  calcium(coords[i][0],coords[i][1]);
-			  coords[i][1]+=1;
+			  coords[i][1]+=1/2;
 		  }
-		  if(type=="Sodium"){
+		  if(type=="Sodium")
+		  {
 			  sodium(coords[i][0],coords[i][1]);
-			  coords[i][1]+=1;
+			  coords[i][1]+=1/2;
 		  }
-		  if(type=="Potassium"){
+		  if(type=="Potassium")
+		  {
 			  potassium(coords[i][0],coords[i][1]);
-			  coords[i][1]-=1;
+			  coords[i][1]-=1/2;
+		  }
+		  if(type=="Glutamate")
+		  {
+			  draw_glut(coords[i][0],coords[i][1]);
+			  coords[i][1]+=1/2;
 		  }
 	  }
-	  
     }
   }
 }
-
 render();
