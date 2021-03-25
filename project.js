@@ -73,7 +73,7 @@ function change_cnqx(x)
 {
 	clearInterval(id);
 	cnqx = x;
-	if(cnqx == 0 && glutamate == 1)
+	if(cnqx == 0 && glutamate == 1 && potential == 70)
 	{
 		coordss = [];
 		for(var i = 0; i < num_AMPA ; i++)
