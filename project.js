@@ -5,6 +5,7 @@ var mg=1;
 var apv = 0;
 var potential = 70;
 var pos = 0;
+var mg_go = 1;
 var id;
 var cnqx = 0;
 var coordss=[];
@@ -26,6 +27,7 @@ function resett()
 	apv = 0;
 	potential = 70;
 	pos = 0;
+	mg_go = 1;
 	cnqx=0
 	reset(num_NMDA,num_AMPA,mg,apv,cnqx,glutamate,potential);
 }
@@ -59,7 +61,7 @@ function change_apv(x)
 {
 	clearInterval(id);
 	apv = x;
-	if(mg == 0 && apv == 0)
+	if(mg == 0 && apv == 0 && glutamate == 1)
 	{
 		var coordss = [[515,400,"Calcium"]];
 		flow(coordss);
@@ -330,8 +332,3 @@ function flow(coords)
 }
 
 render();
-
-
-
-
-
