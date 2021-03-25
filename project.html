@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+.button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+</style>
+<title>LTP</title>
+</head>
+<body>
+<button class="button" onclick="change_glutamate(1)">Add Glutamate</button>
+<button class="button" onclick="change_glutamate(0)">Remove Glutamate</button>
+<button class="button" onclick="change_apv(1)">Add APV</button>
+<button class="button" onclick="change_apv(0)">Remove APV</button>
+<button class="button" onclick="change_cnqx(1)">Add CNQX</button>
+<button class="button" onclick="change_cnqx(0)">Remove CNQX</button>
+<button class="button" onclick="change_polarization(20)">Depolarize</button>
+<button class="button" onclick="change_polarization(70)">Hyperpolarize</button>
+<button class="button" onclick="resett()">Reset</button>
+<canvas id="myCanvas" width="1700" height="900" >
+</canvas>
+<script src="project.js"></script>
+</body>
+</html>
